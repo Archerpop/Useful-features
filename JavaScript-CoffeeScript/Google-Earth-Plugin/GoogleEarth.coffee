@@ -13,14 +13,17 @@ class GoogleEarth
     _kmlList: {}
     _singleKmlHash: null
     
-    constructor: (@_divId, forceInit = false) ->
+    constructor: (@_divId, forceInit = false, callback = null) ->
         @_div = document.getElementById(@_divId)
-        @init() if forceInit is true
+        @init callback if forceInit is true
     
-    init: ->
+    init: (callback = null) ->
         google.earth.createInstance @_divId, (instance) => 
             @_ge = instance
             @_ge.getWindow().setVisibility(true)
+            callback() if typeof callback is "function"
+        , (errorCode) ->
+            console.log errorCode
     
     destroy: -> 
         @disableAllLayer()

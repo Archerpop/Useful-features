@@ -11,8 +11,11 @@ class GoogleEarth
     _ge: null
     _layersState: {}
     
-    constructor: (@_divId) ->
+    constructor: (@_divId, forceInit = false) ->
         @_div = document.getElementById(@_divId)
+        @init() if forceInit is true
+    
+    init: ->
         google.earth.createInstance @_divId, (instance) => 
             @_ge = instance
             @_ge.getWindow().setVisibility(true)

@@ -90,5 +90,15 @@ class GoogleEarth
         @removeKml hash for hash, _ of @_kmlList
         delete @_singleKmlHash
         
+    lookAt: (latitude, longitude, altitude, tilt = 0, roll = 0, speed = 2.5) ->
+        look = @_ge.createCamera('')
+        look.setLatitude latitude
+        look.setLongitude longitude
+        look.setAltitude altitude
+        look.setTilt tilt
+        look.setRoll roll
+        @_ge.getOptions().setFlyToSpeed(if speed > 0.0 then speed else @_ge.SPEED_TELEPORT)
+        @_ge.getView().setAbstractView look
+        
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false

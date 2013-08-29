@@ -40,8 +40,7 @@ class GoogleEarth
         @_ge.getLayerRoot().enableLayerById @_ge[layerName], false
         @_setLayerState layerName, false
     
-    toggleLayer: (layerName, newState) ->
-        newState = !@_getLayerState(layerName) if !newState?
+    toggleLayer: (layerName, newState = !@_getLayerState(layerName)) ->
         @_ge.getLayerRoot().enableLayerById @_ge[layerName], newState
         @_setLayerState layerName, newState
         
@@ -53,19 +52,19 @@ class GoogleEarth
     
     enableScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility true
     disableScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility false
-    toggleScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility !@_ge.getOptions().getScaleLegendVisibility()
+    toggleScaleLegend: (newValue = !@_ge.getOptions().getScaleLegendVisibility()) -> @_ge.getOptions().setScaleLegendVisibility newValue
     
     enableStatusBar: -> @_ge.getOptions().setStatusBarVisibility true
     disableStatusBar: -> @_ge.getOptions().setStatusBarVisibility false
-    toggleStatusBar: -> @_ge.getOptions().setStatusBarVisibility !@_ge.getOptions().getStatusBarVisibility()
-    
+    toggleStatusBar: (newValue = !@_ge.getOptions().getStatusBarVisibility()) -> @_ge.getOptions().setStatusBarVisibility newValue
+  
     enableOverviewMap: -> @_ge.getOptions().setOverviewMapVisibility true
     disableOverviewMap: -> @_ge.getOptions().setOverviewMapVisibility false
-    toggleOverviewMap: -> @_ge.getOptions().setOverviewMapVisibility !@_ge.getOptions().getOverviewMapVisibility()
+    toggleOverviewMap: (newValue = !@_ge.getOptions().getOverviewMapVisibility()) -> @_ge.getOptions().setOverviewMapVisibility newValue
     
     enableGrid: -> @_ge.getOptions().setGridVisibility true
     disableGrid: -> @_ge.getOptions().setGridVisibility false
-    toggleGrid: -> @_ge.getOptions().setGridVisibility !@_ge.getOptions().getGridVisibility()
+    toggleGrid: (newValue = !@_ge.getOptions().getGridVisibility()) -> @_ge.getOptions().setGridVisibility newValue
         
     enableNavigationControl: -> @_ge.getNavigationControl().setVisibility @_ge.VISIBILITY_SHOW
     disableNavigationControl: -> @_ge.getNavigationControl().setVisibility @_ge.VISIBILITY_HIDE

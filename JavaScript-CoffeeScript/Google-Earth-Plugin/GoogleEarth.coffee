@@ -86,6 +86,9 @@ class GoogleEarth
         @_kmlList[hash] = @_ge.getFeatures().removeChild @_kmlList[hash]
         delete @_kmlList[hash]
     
-    
+    removeAllKml: ->
+        @removeKml hash for hash, _ of @_kmlList
+        delete @_singleKmlHash
+        
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false

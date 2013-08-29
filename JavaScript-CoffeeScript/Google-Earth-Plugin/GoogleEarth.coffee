@@ -63,7 +63,11 @@ class GoogleEarth
     enableGrid: -> @_ge.getOptions().setGridVisibility true
     disableGrid: -> @_ge.getOptions().setGridVisibility false
     toggleGrid: -> @_ge.getOptions().setGridVisibility !@_ge.getOptions().getGridVisibility()
-          
+        
+    enableNavigationControl: -> @_ge.getNavigationControl().setVisibility @_ge.VISIBILITY_SHOW
+    disableNavigationControl: -> @_ge.getNavigationControl().setVisibility @_ge.VISIBILITY_HIDE
+    toggleNavigationControl: -> @_ge.getNavigationControl().setVisibility(if @_ge.getNavigationControl().getVisibility() is @_ge.VISIBILITY_SHOW then @_ge.VISIBILITY_HIDE else @_ge.VISIBILITY_SHOW)
+    
     addKml: (url, forceLookAt = false) ->
         link = @_ge.createLink("")
         link.setHref url

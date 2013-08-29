@@ -10,6 +10,8 @@ class GoogleEarth
     _div:  null
     _ge: null
     _layersState: {}
+    _kmlList: {}
+    _singleKmlHash: null
     
     constructor: (@_divId, forceInit = false) ->
         @_div = document.getElementById(@_divId)
@@ -46,21 +48,40 @@ class GoogleEarth
             @_setLayerState layer, false
         true
     
-    enableScaleLegend: ->@_ge.getOptions().setScaleLegendVisibility true
-    disableScaleLegend: ->@_ge.getOptions().setScaleLegendVisibility false
-    toggleScaleLegend: ->@_ge.getOptions().setScaleLegendVisibility !@_ge.getOptions().getScaleLegendVisibility()
+    enableScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility true
+    disableScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility false
+    toggleScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility !@_ge.getOptions().getScaleLegendVisibility()
     
     enableStatusBar: -> @_ge.getOptions().setStatusBarVisibility true
     disableStatusBar: -> @_ge.getOptions().setStatusBarVisibility false
     toggleStatusBar: -> @_ge.getOptions().setStatusBarVisibility !@_ge.getOptions().getStatusBarVisibility()
     
-    enableOverviewMap: ->@_ge.getOptions().setOverviewMapVisibility true
-    disableOverviewMap: ->@_ge.getOptions().setOverviewMapVisibility false
-    toggleOverviewMap: ->@_ge.getOptions().setOverviewMapVisibility !@_ge.getOptions().getOverviewMapVisibility()
+    enableOverviewMap: -> @_ge.getOptions().setOverviewMapVisibility true
+    disableOverviewMap: -> @_ge.getOptions().setOverviewMapVisibility false
+    toggleOverviewMap: -> @_ge.getOptions().setOverviewMapVisibility !@_ge.getOptions().getOverviewMapVisibility()
     
-    enableGrid: ->@_ge.getOptions().setGridVisibility true
-    disableGrid: ->@_ge.getOptions().setGridVisibility false
-    toggleGrid: ->@_ge.getOptions().setGridVisibility !@_ge.getOptions().getGridVisibility()
+    enableGrid: -> @_ge.getOptions().setGridVisibility true
+    disableGrid: -> @_ge.getOptions().setGridVisibility false
+    toggleGrid: -> @_ge.getOptions().setGridVisibility !@_ge.getOptions().getGridVisibility()
+          
+    addKml: (url, forceLookAt = false) ->
+        link = @_ge.createLink("")
+        link.setHref url
+        networkLink = @_ge.createNetworkLink("")
+        networkLink.set link, true, forceLookAt
+        hash = randomHash()
+        @_kmlList[hash] = @_ge.getFeatures().appendChild networkLink
+        hash
+     
+    addSingleKml: (url, forceLookAt = false) ->
+        @removeKml @_singleKmlHash if @_singleKmlHash?
+        @_singleKmlHash = @addKml url, forceLookAt
         
+    removeKml: (hash) ->
+        return false if !@_kmlList[hash]?
+        @_kmlList[hash] = @_ge.getFeatures().removeChild @_kmlList[hash]
+        delete @_kmlList[hash]
+    
+    
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false

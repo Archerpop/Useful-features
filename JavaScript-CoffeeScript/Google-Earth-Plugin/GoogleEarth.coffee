@@ -22,6 +22,8 @@ class GoogleEarth
         delete @_ge
         @_div.innerHTML = ""
         
+    getDiv: -> _div
+    
     enableLayer: (layerName) -> 
         @_ge.getLayerRoot().enableLayerById @_ge[layerName], true
         @_setLayerState layerName, true
@@ -41,7 +43,21 @@ class GoogleEarth
             @_setLayerState layer, false
         true
     
-    getDiv: -> _div
+    enableScaleLegend: ->@_ge.getOptions().setScaleLegendVisibility true
+    disableScaleLegend: ->@_ge.getOptions().setScaleLegendVisibility false
+    toggleScaleLegend: ->@_ge.getOptions().setScaleLegendVisibility !@_ge.getOptions().getScaleLegendVisibility()
     
+    enableStatusBar: -> @_ge.getOptions().setStatusBarVisibility true
+    disableStatusBar: -> @_ge.getOptions().setStatusBarVisibility false
+    toggleStatusBar: -> @_ge.getOptions().setStatusBarVisibility !@_ge.getOptions().getStatusBarVisibility()
+    
+    enableOverviewMap: ->@_ge.getOptions().setOverviewMapVisibility true
+    disableOverviewMap: ->@_ge.getOptions().setOverviewMapVisibility false
+    toggleOverviewMap: ->@_ge.getOptions().setOverviewMapVisibility !@_ge.getOptions().getOverviewMapVisibility()
+    
+    enableGrid: ->@_ge.getOptions().setGridVisibility true
+    disableGrid: ->@_ge.getOptions().setGridVisibility false
+    toggleGrid: ->@_ge.getOptions().setGridVisibility !@_ge.getOptions().getGridVisibility()
+        
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false

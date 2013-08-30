@@ -4,7 +4,7 @@ class GoogleEarth
     LAYER_BUILDINGS: "LAYER_BUILDINGS"
     LAYER_BUILDINGS_LOW_RESOLUTION: "LAYER_BUILDINGS_LOW_RESOLUTION"
     LAYER_TERRAIN: "LAYER_TERRAIN"
-    LAYER_TREES: "LAYER_TREES "
+    LAYER_TREES: "LAYER_TREES"
     
     _divId: null
     _div:  null
@@ -103,26 +103,27 @@ class GoogleEarth
         @_ge.getOptions().setFlyToSpeed(if speed > 0.0 then speed else @_ge.SPEED_TELEPORT)
         @_ge.getView().setAbstractView look
         
-    addCircle: (latitude, longitude, radius, countPoints = 25) ->
-        placemark = @_ge.createPlacemark ""
-        line = @_ge.createLineString ""
-        placemark.setGeometry line
-        line.setExtrude true
-        line.setAltitudeMode @_ge.ALTITUDE_RELATIVE_TO_GROUND
+    addCircle: (latitude, longitude, radius, countPoints = 100) ->
         diameter = radius / 6378.8
         rLatitude = diameter * (180 / Math.PI)
         rLongitude = rLatitude / (Math.cos(latitude * (Math.PI / 180)))
+        createPointsList = ->
+            for i in [0..countPoints]
+                rad = (360 / countPoints * i) * (Math.PI / 180)
+                y = latitude + (rLatitude * Math.sin(rad))
+                x = longitude + (rLongitude * Math.cos(rad))
+                [y, x]
+        @addLine createPointsList()
         
-        for i in [0..countPoints]
-            rad = (360 / countPoints * i) * (Math.PI / 180)
-            y = latitude + (rLatitude * Math.sin(rad))
-            x = longitude + (rLongitude * Math.cos(rad))
-            line.getCoordinates().pushLatLngAlt(y, x, 1)            
-
+    addLine: (pointsList = []) ->
+        placemark = @_ge.createPlacemark ""
+        line = @_ge.createLineString ""
+        placemark.setGeometry line
+        line.getCoordinates().pushLatLngAlt point[0], point[1], 0 for point in pointsList
         hash = @_randomHash()
         @_polygonsList[hash] = @_ge.getFeatures().appendChild placemark   
         hash
-    
+        
     removePolygon: (hash) ->
         return false if !@_polygonsList[hash]?
         @_polygonsList[hash] = @_ge.getFeatures().removeChild @_polygonsList[hash]

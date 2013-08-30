@@ -76,7 +76,7 @@ class GoogleEarth
         link.setHref url
         networkLink = @_ge.createNetworkLink ""
         networkLink.set link, true, forceLookAt
-        hash = randomHash()
+        hash = @_randomHash()
         @_kmlList[hash] = @_ge.getFeatures().appendChild networkLink
         hash
      
@@ -119,7 +119,7 @@ class GoogleEarth
             x = longitude + (rLongitude * Math.cos(rad))
             line.getCoordinates().pushLatLngAlt(y, x, 1)            
 
-        hash = randomHash()
+        hash = @_randomHash()
         @_polygonsList[hash] = @_ge.getFeatures().appendChild placemark   
         hash
     
@@ -130,3 +130,9 @@ class GoogleEarth
         
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false
+    
+    _randomHash: (length = 32) ->
+        letters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890"
+        result = ""
+        result += letters[Math.floor(Math.random() * letters.length)] for i in [0...length]
+        result

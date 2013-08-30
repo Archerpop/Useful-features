@@ -12,6 +12,7 @@ class GoogleEarth
     _layersState: {}
     _kmlList: {}
     _singleKmlHash: null
+    _polygonsList: {}
     
     constructor: (@_divId, forceInit = false, callback = null) ->
         @_div = document.getElementById(@_divId)
@@ -71,9 +72,9 @@ class GoogleEarth
     toggleNavigationControl: -> @_ge.getNavigationControl().setVisibility(if @_ge.getNavigationControl().getVisibility() is @_ge.VISIBILITY_SHOW then @_ge.VISIBILITY_HIDE else @_ge.VISIBILITY_SHOW)
     
     addKml: (url, forceLookAt = false) ->
-        link = @_ge.createLink("")
+        link = @_ge.createLink ""
         link.setHref url
-        networkLink = @_ge.createNetworkLink("")
+        networkLink = @_ge.createNetworkLink ""
         networkLink.set link, true, forceLookAt
         hash = randomHash()
         @_kmlList[hash] = @_ge.getFeatures().appendChild networkLink
@@ -93,7 +94,7 @@ class GoogleEarth
         delete @_singleKmlHash
         
     lookAt: (latitude, longitude, altitude, tilt = 0, roll = 0, speed = 2.5) ->
-        look = @_ge.createCamera('')
+        look = @_ge.createCamera ""
         look.setLatitude latitude
         look.setLongitude longitude
         look.setAltitude altitude
@@ -101,6 +102,31 @@ class GoogleEarth
         look.setRoll roll
         @_ge.getOptions().setFlyToSpeed(if speed > 0.0 then speed else @_ge.SPEED_TELEPORT)
         @_ge.getView().setAbstractView look
+        
+    addCircle: (latitude, longitude, radius, countPoints = 25) ->
+        placemark = @_ge.createPlacemark ""
+        line = @_ge.createLineString ""
+        placemark.setGeometry line
+        line.setExtrude true
+        line.setAltitudeMode @_ge.ALTITUDE_RELATIVE_TO_GROUND
+        diameter = radius / 6378.8
+        rLatitude = diameter * (180 / Math.PI)
+        rLongitude = rLatitude / (Math.cos(latitude * (Math.PI / 180)))
+        
+        for i in [0..countPoints]
+            rad = (360 / countPoints * i) * (Math.PI / 180)
+            y = latitude + (rLatitude * Math.sin(rad))
+            x = longitude + (rLongitude * Math.cos(rad))
+            line.getCoordinates().pushLatLngAlt(y, x, 1)            
+
+        hash = randomHash()
+        @_polygonsList[hash] = @_ge.getFeatures().appendChild placemark   
+        hash
+    
+    removePolygon: (hash) ->
+        return false if !@_polygonsList[hash]?
+        @_polygonsList[hash] = @_ge.getFeatures().removeChild @_polygonsList[hash]
+        delete @_polygonsList[hash]
         
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false

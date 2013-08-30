@@ -30,6 +30,10 @@ class GoogleEarth
         @disableAllLayer()
         delete @_ge
         @_div.innerHTML = ""
+    
+    clearAll: ->
+        @removeAllKml()
+        @removeAllPolygons()
         
     getDiv: -> _div
     
@@ -128,8 +132,8 @@ class GoogleEarth
         return false if !@_polygonsList[hash]?
         @_polygonsList[hash] = @_ge.getFeatures().removeChild @_polygonsList[hash]
         delete @_polygonsList[hash]
-    
-    removeAllPolygons: ->@removePolygon hash for hash, _ of @_polygonsList
+        
+    removeAllPolygons: -> @removePolygon hash for hash, _ of @_polygonsList
         
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false

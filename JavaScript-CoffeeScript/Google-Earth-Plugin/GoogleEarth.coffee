@@ -97,7 +97,17 @@ class GoogleEarth
         @removeKml hash for hash, _ of @_kmlList
         delete @_singleKmlHash
         
-    lookAt: (latitude, longitude, altitude, tilt = 0, roll = 0, speed = 2.5) ->
+    getCamera: ->
+        look = @_ge.getView().copyAsCamera @_ge.ALTITUDE_RELATIVE_TO_GROUND
+        res = 
+            latitude: @_roundCoordinates look.getLatitude()
+            longitude: @_roundCoordinates look.getLongitude()
+            altitude: @_roundCoordinates look.getAltitude()
+            titl: look.getTilt()
+            roll: look.getRoll()
+            speed: @_ge.getOptions().getFlyToSpeed()
+            
+    setCamera: (latitude, longitude, altitude, tilt = 0, roll = 0, speed = 2.5) ->
         look = @_ge.createCamera ""
         look.setLatitude latitude
         look.setLongitude longitude
@@ -143,3 +153,5 @@ class GoogleEarth
         result = ""
         result += letters[Math.floor(Math.random() * letters.length)] for i in [0...length]
         result
+        
+    _roundCoordinates: (val) -> val.toFixed(4) * 1

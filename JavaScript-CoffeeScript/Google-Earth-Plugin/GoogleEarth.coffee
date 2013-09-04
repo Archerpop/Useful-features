@@ -15,6 +15,7 @@ class GoogleEarth
             @polygon.self = @
             @camera.self = @
             @kml.self = @
+            @yardstick.self = @
             callback() if typeof callback is "function"
         , (errorCode) ->
             console.log errorCode
@@ -142,7 +143,53 @@ class GoogleEarth
         removeAll: ->
             @remove hash for hash, _ of @_kmlList
             delete @_singleKmlHash
+         
+    yardstick:
+        _pointsList: []
+        _lineHash: null
+        _placemark: null
+        
+        addPoint: (latitude, longitude) ->
+            @_removePlacemark()
+            @_pointsList.push [latitude, longitude]
+            @_redrawLine()
+            @_createPlacemark latitude, longitude
             
+        clear: ->
+            @self.polygon.remove @_lineHash if @_lineHash?
+            delete @_lineHash
+            @_pointsList = []
+            @_removePlacemark()
+            
+        getSummaryLength: ->
+            res = 0
+            res += @self.countDistance @_pointsList[i], @_pointsList[i+1] for i in [0...@_pointsList.length-1]
+            res.toFixed 3
+            
+        _redrawLine: ->
+            @self.polygon.remove @_lineHash if @_lineHash?
+            @_lineHash = @self.polygon.addLine @_pointsList
+           
+        _createPlacemark: (latitude, longitude) ->
+            placemark = @self._ge.createPlacemark ""
+            placemark.setName "#{@getSummaryLength()}"
+            
+            icon = @self._ge.createIcon ""
+            icon.setHref "https://maps.google.com/mapfiles/kml/shapes/placemark_circle.png"
+            style = @self._ge.createStyle ""
+            style.getIconStyle().setIcon icon
+            style.getIconStyle().setScale 0.1
+            placemark.setStyleSelector style
+            
+            point = @self._ge.createPoint ""
+            point.setLatitude latitude
+            point.setLongitude longitude
+            placemark.setGeometry point
+            
+            @_placemark =  @self._ge.getFeatures().appendChild placemark
+            
+        _removePlacemark: -> @self._ge.getFeatures().removeChild @_placemark if @_placemark?
+        
     enableScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility true
     disableScaleLegend: -> @_ge.getOptions().setScaleLegendVisibility false
     toggleScaleLegend: (newValue = !@_ge.getOptions().getScaleLegendVisibility()) -> @_ge.getOptions().setScaleLegendVisibility newValue
@@ -163,6 +210,18 @@ class GoogleEarth
     disableNavigationControl: -> @_ge.getNavigationControl().setVisibility @_ge.VISIBILITY_HIDE
     toggleNavigationControl: -> @_ge.getNavigationControl().setVisibility(if @_ge.getNavigationControl().getVisibility() is @_ge.VISIBILITY_SHOW then @_ge.VISIBILITY_HIDE else @_ge.VISIBILITY_SHOW)
     
+    countDistance: (point1, point2) ->
+        lat1 = point1[0]
+        lng1 = point1[1]
+        lat2 = point2[0]
+        lng2 = point2[1]        
+        degToRad = (val) -> val * 0.017453292519943295
+        radToDeg = (val) -> val * 57.29577951308232
+        
+        dist = radToDeg Math.acos((Math.sin(degToRad lat1) * Math.sin(degToRad lat2)) + (Math.cos(degToRad lat1) * Math.cos(degToRad lat2) * Math.cos(degToRad(lng1 - lng2))))
+        miles = dist * 60 * 1.1515
+        kilometers = (miles * 1.609344).toFixed(3) * 1
+        
     _randomHash: (length = 32) ->
         letters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890"
         result = ""

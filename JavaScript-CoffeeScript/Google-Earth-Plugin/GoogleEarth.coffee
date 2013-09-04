@@ -21,7 +21,7 @@ class GoogleEarth
     init: (callback = null) ->
         google.earth.createInstance @_divId, (instance) => 
             @_ge = instance
-            @_ge.getWindow().setVisibility(true)
+            @_ge.getWindow().setVisibility true
             callback() if typeof callback is "function"
         , (errorCode) ->
             console.log errorCode
@@ -117,7 +117,7 @@ class GoogleEarth
         @_ge.getOptions().setFlyToSpeed(if speed > 0.0 then speed else @_ge.SPEED_TELEPORT)
         @_ge.getView().setAbstractView look
         
-    addCircle: (latitude, longitude, radius, countPoints = 100) ->
+    addCircle: (latitude, longitude, radius, countPoints = 100, style = null) ->
         diameter = radius / 6378.8
         rLatitude = diameter * (180 / Math.PI)
         rLongitude = rLatitude / (Math.cos(latitude * (Math.PI / 180)))
@@ -127,13 +127,18 @@ class GoogleEarth
                 y = latitude + (rLatitude * Math.sin(rad))
                 x = longitude + (rLongitude * Math.cos(rad))
                 [y, x]
-        @addLine createPointsList()
+        @addLine createPointsList(), style
         
-    addLine: (pointsList = []) ->
+    addLine: (pointsList = [], style = null) ->
         placemark = @_ge.createPlacemark ""
         line = @_ge.createLineString ""
         placemark.setGeometry line
         line.getCoordinates().pushLatLngAlt point[0], point[1], 0 for point in pointsList
+        if style?
+            placemark.setStyleSelector @_ge.createStyle ""
+            placemarkStyle = placemark.getStyleSelector().getLineStyle()
+            placemarkStyle.setWidth style.width if style.width?
+            placemarkStyle.getColor().set style.color if style.color?
         hash = @_randomHash()
         @_polygonsList[hash] = @_ge.getFeatures().appendChild placemark   
         hash
@@ -144,7 +149,7 @@ class GoogleEarth
         delete @_polygonsList[hash]
         
     removeAllPolygons: -> @removePolygon hash for hash, _ of @_polygonsList
-        
+    
     _setLayerState: (layerName, newState) -> @_layersState[layerName] = newState
     _getLayerState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false
     

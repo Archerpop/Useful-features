@@ -1,7 +1,8 @@
 class GoogleEarth    
     _divId: null
     _div:  null
-    _ge: null
+    _ge: null    
+    _modulesList: ["point", "polygon", "camera", "kml", "yardstick", "layer"]
     
     # Конструктор.
     # {_divId} string - Id блока-обертки для карты.
@@ -17,30 +18,25 @@ class GoogleEarth
         google.earth.createInstance @_divId, (instance) => 
             @_ge = instance
             @_ge.getWindow().setVisibility true
-            @layer.self = @
-            @point.self = @
-            @polygon.self = @
-            @camera.self = @
-            @kml.self = @
-            @yardstick.self = @
+            @[module].self = @ for module in @_modulesList
             callback() if typeof callback is "function"
         , (errorCode) ->
             console.log errorCode
-    
-    # Уничтожает объект карты.
-    destroy: -> 
-        @disableAllLayer()
-        delete @_ge
-        @_div.innerHTML = ""
-    
-    # Очищает карту от нанесенных на нее элементов.
-    clearAll: ->
-        @kml.remveAll()
-        @polygon.removeAll()
-        @yardstick.clear()
         
     # Возвращает DOM-элемент, в котором находится карта.
     getDiv: -> _div
+    
+    # Удаляет карту.
+    # Отключает все слои, удаляет все нанесенные объекты, очищает содержимое обертки карты (@see getDiv()) и уничтожает объект карты.
+    destroy: -> 
+        @layer.disableAll()
+        @clearAll()
+        @_div.innerHTML = ""
+        delete @_ge
+    
+    # Очищает карту от нанесенных на нее элементов.
+    # Вызывает метод removeAll() для каждого модуля у которого этот метод описан.
+    clearAll: ->  @[module].removeAll() for module in @_modulesList when typeof @[module].removeAll is "function"
     
     # Работа со слоями.
     layer:

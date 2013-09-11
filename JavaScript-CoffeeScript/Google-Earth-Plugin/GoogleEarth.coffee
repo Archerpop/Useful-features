@@ -18,6 +18,7 @@ class GoogleEarth
             @_ge = instance
             @_ge.getWindow().setVisibility true
             @layer.self = @
+            @point.self = @
             @polygon.self = @
             @camera.self = @
             @kml.self = @
@@ -85,6 +86,45 @@ class GoogleEarth
         _setState: (layerName, newState) -> @_layersState[layerName] = newState
         _getState: (layerName) -> if @_layersState[layerName]? then @_layersState[layerName] else false
     
+    # Работа с метками.
+    point: 
+        _pointsList: {}
+        
+        # Добавляет на карту метку.
+        # {latitude} float - Широта.
+        # {longitude} float - Долгота.
+        # {name} string - Название метки. По умолчанию null.
+        # {iconUrl} string - url-адрес для иконки. Если null - используется стандартная иконка. По умолчанию null.
+        add: (latitude, longitude, name = null, iconUrl = null) ->
+            placemark = @self._ge.createPlacemark ""
+            placemark.setName name if name?
+            
+            if iconUrl?
+                icon = @self._ge.createIcon ""
+                icon.setHref iconUrl
+                style = @self._ge.createStyle ""
+                style.getIconStyle().setIcon icon
+                placemark.setStyleSelector style
+            
+            point = @self._ge.createPoint ""
+            point.setLatitude latitude
+            point.setLongitude longitude
+            placemark.setGeometry point
+            
+            hash = @self._randomHash()
+            @_pointsList[hash] = @self._ge.getFeatures().appendChild placemark
+            hash
+            
+        # Удаляет метку с карты по ее хешу.
+        # {hash} string - Хэш метки.
+        remove: (hash) ->
+            return false if !@_pointsList[hash]?
+            @_pointsList[hash] = @self._ge.getFeatures().removeChild @_pointsList[hash]
+            delete @_pointsList[hash]
+        
+        # Удаляет с карты все метки.
+        removeAll: -> @remove hash for hash, _ of @_pointsList
+        
     # Работа с полигонами.
     polygon: 
         _polygonsList: {}

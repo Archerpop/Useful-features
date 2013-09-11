@@ -34,8 +34,9 @@ class GoogleEarth
     
     # Очищает карту от нанесенных на нее элементов.
     clearAll: ->
-        @removeAllKml()
-        @removeAllPolygons()
+        @kml.remveAll()
+        @polygon.removeAll()
+        @yardstick.clear()
         
     # Возвращает DOM-элемент, в котором находится карта.
     getDiv: -> _div

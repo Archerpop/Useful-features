@@ -116,7 +116,7 @@ class GoogleEarth
         # {hash} string - Хэш метки.
         remove: (hash) ->
             return false if !@_pointsList[hash]?
-            @_pointsList[hash] = @self._ge.getFeatures().removeChild @_pointsList[hash]
+            @self._ge.getFeatures().removeChild @_pointsList[hash]
             delete @_pointsList[hash]
         
         # Удаляет с карты все метки.
@@ -174,7 +174,7 @@ class GoogleEarth
         # {hash} string - Хэш фигуры.
         remove: (hash) ->
             return false if !@_polygonsList[hash]?
-            @_polygonsList[hash] = @self._ge.getFeatures().removeChild @_polygonsList[hash]
+            @self._ge.getFeatures().removeChild @_polygonsList[hash]
             delete @_polygonsList[hash]
 
         # Удаляет с карты все фигуры.
@@ -248,7 +248,7 @@ class GoogleEarth
         # {hash} string - хэш файла.
         remove: (hash) ->
             return false if !@_kmlList[hash]?
-            @_kmlList[hash] = @_ge.getFeatures().removeChild @_kmlList[hash]
+            @self._ge.getFeatures().removeChild @_kmlList[hash]
             delete @_kmlList[hash]
 
         # Удаляет с карты содержимое всех файлов.

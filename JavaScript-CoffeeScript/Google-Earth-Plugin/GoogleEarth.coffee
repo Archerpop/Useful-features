@@ -10,7 +10,8 @@ class GoogleEarth
     # {callback} function - @see self::init()
     constructor: (@_divId, forceInit = false, callback = null) ->
         @_div = document.getElementById(@_divId)
-        @init callback if forceInit is true
+        google.load "earth", 1, callback: =>
+            @init callback if forceInit is true
     
     # Инициализирует объект карты.
     #{callback} function - функция, которая будет вызвана по окончанию загрузки карты.
